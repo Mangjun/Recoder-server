@@ -77,9 +77,6 @@ services:
       dockerfile: Dockerfile
     image: recoder-server
     container_name: hgcq-recoder
-    volumes:
-      - D:/app/temp/:/app/temp/
-      - D:/app/images/:/app/images/
     depends_on:
       - mysql
       - redis
