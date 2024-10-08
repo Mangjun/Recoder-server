@@ -1,7 +1,6 @@
 package yuhan.hgcq.server.kafka.producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import yuhan.hgcq.server.kafka.message.PhotoAutoSaveMessage;
 

@@ -2,7 +2,6 @@ package yuhan.hgcq.server.kafka.consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import yuhan.hgcq.server.config.FileStorageUtil;
 import yuhan.hgcq.server.domain.Member;
