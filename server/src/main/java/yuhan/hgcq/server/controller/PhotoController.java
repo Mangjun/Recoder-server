@@ -31,8 +31,8 @@ public class PhotoController {
     private final AlbumService as;
     private final PhotoService ps;
     private final LikedService ls;
-    private final PhotoUploadProducer up;
-    private final PhotoAutoSaveProducer asp;
+//    private final PhotoUploadProducer up;
+//    private final PhotoAutoSaveProducer asp;
 
     /**
      * Upload photo
