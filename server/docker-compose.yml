@@ -1,0 +1,108 @@
+# docker-compose
+
+services:
+  # mysql
+  mysql:
+    image: mysql:8.0.32
+    container_name: hgcq-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # redis
+  redis:
+    image: redis
+    container_name: hgcq-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+  # zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    container_name: hgcq-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "echo", "ruok | nc localhost 2181 | grep imok" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # kafka
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: hgcq-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # spring boot
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: recoder-server
+    container_name: hgcq-recoder
+    volumes:
+      - D:/app/temp/:/app/temp/
+      - D:/app/images/:/app/images/
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: ${MYSQL_URL}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+  redis-data:
+  kafka-data:
+
+networks:
+  app-network:
+    driver: bridge
