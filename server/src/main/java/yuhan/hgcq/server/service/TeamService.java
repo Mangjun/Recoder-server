@@ -1,8 +1,11 @@
 package yuhan.hgcq.server.service;
 
+import io.awspring.cloud.s3.ObjectMetadata;
+import io.awspring.cloud.s3.S3Operations;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.expression.AccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,7 @@ import yuhan.hgcq.server.repository.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,11 +35,13 @@ public class TeamService {
     private final LikedRepository lr;
     private final ChatRepository cr;
     private final PhotoRepository pr;
+    private final S3Operations s3Operations;
 
-    private final static String DIRECTORY_PATH = File.separator
-            + "app" + File.separator
-            + "images" + File.separator
-            + "team" + File.separator;
+    @Value("${spring.cloud.aws.s3.bucket}")
+    private String bucketName;
+
+    @Value("${spring.cloud.aws.region.static}")
+    private String region;
 
     /**
      * Create Team
@@ -148,27 +154,20 @@ public class TeamService {
         List<Member> adminList = tmr.findAdminByTeam(ft);
 
         if (adminList.contains(member)) {
-            try {
-                String newPath = DIRECTORY_PATH + teamId + File.separator;
-                File directory = new File(newPath);
+            String name = file.getOriginalFilename();
 
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
+            String key = "images/team/" + ft.getId() + "/" + name;
 
-                String name = file.getOriginalFilename();
-
-                Path path = Paths.get(newPath + name);
-                file.transferTo(path);
-                String imagePath = "/images/team/" + teamId + "/" + name;
-
-                ft.changeImage(imagePath);
+            try (InputStream inputStream = file.getInputStream()) {
+                s3Operations.upload(bucketName, key, inputStream,
+                        ObjectMetadata.builder().contentType(file.getContentType()).build());
+                ft.changeImage(key);
                 tr.save(ft);
 
-                log.info("Upload Team Image : {}", imagePath);
+                log.info("Upload Team Image : {}", key);
             } catch (IOException e) {
                 log.error("Upload Team Image Error");
-                throw new IOException();
+                throw new IOException(e.getMessage());
             }
         } else {
             throw new AccessException("Not admin");
