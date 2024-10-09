@@ -18,8 +18,5 @@ public class PhotoConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("https://" + bucket + ".s3." + region + ".amazonaws.com/images/");
-
-        registry.addResourceHandler("/thumbnails/**")
-                .addResourceLocations("https://" + bucket + ".s3." + region + ".amazonaws.com/thumbnails/");
     }
 }

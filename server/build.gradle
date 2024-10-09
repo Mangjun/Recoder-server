@@ -35,7 +35,6 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
-	implementation 'net.coobird:thumbnailator:0.4.14'
 	implementation 'com.google.code.gson:gson'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'

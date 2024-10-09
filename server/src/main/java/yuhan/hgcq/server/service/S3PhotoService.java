@@ -4,7 +4,6 @@ import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +20,6 @@ import yuhan.hgcq.server.repository.LikedRepository;
 import yuhan.hgcq.server.repository.PhotoRepository;
 import yuhan.hgcq.server.repository.TeamRepository;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -78,29 +75,13 @@ public class S3PhotoService implements PhotoService {
             }
 
             String key = "images/" + albumId + "/" + name;
-            String thumbnailKey = "thumbnails/" + albumId + "/" + name;
 
-            try {
-                byte[] fileBytes = file.getBytes();
-
-                try (InputStream originalInputStream = new ByteArrayInputStream(fileBytes)) {
-                    s3Operations.upload(bucketName, key, originalInputStream,
-                            ObjectMetadata.builder().contentType(file.getContentType()).build());
-                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
-                    pr.save(photo);
-                    log.info("Save Photo : {}", photo);
-                } catch (IOException e) {
-                    throw new IOException(e.getMessage());
-                }
-
-                InputStream thumbnailInputStream = createThumbnailInputStream(fileBytes);
-                byte[] thumbnailBytes = thumbnailInputStream.readAllBytes();
-
-                try (InputStream thumbnailStream = new ByteArrayInputStream(thumbnailBytes)) {
-                    s3Operations.upload(bucketName, thumbnailKey,
-                            thumbnailStream, ObjectMetadata.builder().contentType("image/jpeg").build());
-                    log.info("Save Thumbnail");
-                }
+            try (InputStream inputStream = file.getInputStream()) {
+                s3Operations.upload(bucketName, key, inputStream,
+                        ObjectMetadata.builder().contentType(file.getContentType()).build());
+                Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
+                pr.save(photo);
+                log.info("Save Photo : {}", photo);
             } catch (IOException e) {
                 throw new IOException(e.getMessage());
             }
@@ -284,29 +265,13 @@ public class S3PhotoService implements PhotoService {
                 }
 
                 String key = "images/" + albumId + "/" + name;
-                String thumbnailKey = "thumbnails/" + albumId + "/" + name;
 
-                try {
-                    byte[] fileBytes = file.getBytes();
-
-                    try (InputStream originalInputStream = new ByteArrayInputStream(fileBytes)) {
-                        s3Operations.upload(bucketName, key, originalInputStream,
-                                ObjectMetadata.builder().contentType(file.getContentType()).build());
-                        Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
-                        pr.save(photo);
-                        log.info("AutoSave Photo : {}", photo);
-                    } catch (IOException e) {
-                        throw new IOException(e.getMessage());
-                    }
-
-                    InputStream thumbnailInputStream = createThumbnailInputStream(fileBytes);
-                    byte[] thumbnailBytes = thumbnailInputStream.readAllBytes();
-
-                    try (InputStream thumbnailStream = new ByteArrayInputStream(thumbnailBytes)) {
-                        s3Operations.upload(bucketName, thumbnailKey,
-                                thumbnailStream, ObjectMetadata.builder().contentType("image/jpeg").build());
-                        log.info("Save Thumbnail");
-                    }
+                try (InputStream inputStream = file.getInputStream()) {
+                    s3Operations.upload(bucketName, key, inputStream,
+                            ObjectMetadata.builder().contentType(file.getContentType()).build());
+                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
+                    pr.save(photo);
+                    log.info("AutoSave Photo : {}", photo);
                 } catch (IOException e) {
                     throw new IOException(e.getMessage());
                 }
@@ -354,15 +319,5 @@ public class S3PhotoService implements PhotoService {
         if (obj == null) {
             throw new IllegalArgumentException(name + " is null");
         }
-    }
-
-    private InputStream createThumbnailInputStream(byte[] fileBytes) throws IOException {
-        ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
-        Thumbnails.of(new ByteArrayInputStream(fileBytes))
-                .size(150, 150)
-                .outputFormat("jpg")
-                .toOutputStream(thumbnailOutputStream);
-        byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
-        return new ByteArrayInputStream(thumbnailBytes);
     }
 }
