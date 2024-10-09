@@ -4,6 +4,7 @@ import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
+import net.coobird.thumbnailator.Thumbnails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,8 @@ import yuhan.hgcq.server.repository.LikedRepository;
 import yuhan.hgcq.server.repository.PhotoRepository;
 import yuhan.hgcq.server.repository.TeamRepository;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -43,9 +46,6 @@ public class S3PhotoService implements PhotoService {
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
-
-    @Value("${spring.cloud.aws.region.static}")
-    private String region;
 
     /**
      * Upload photo
@@ -351,5 +351,15 @@ public class S3PhotoService implements PhotoService {
         if (obj == null) {
             throw new IllegalArgumentException(name + " is null");
         }
+    }
+
+    private InputStream createThumbnailInputStream(MultipartFile file) throws IOException {
+        ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+        Thumbnails.of(file.getInputStream())
+                .size(150, 150)
+                .outputFormat("jpg")
+                .toOutputStream(thumbnailOutputStream);
+        byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
+        return new ByteArrayInputStream(thumbnailBytes);
     }
 }

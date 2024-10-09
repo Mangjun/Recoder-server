@@ -49,6 +49,30 @@ public class MemberController {
         }
     }
 
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            MemberDTO loginMember = (MemberDTO) session.getAttribute("member");
+
+            if (loginMember != null) {
+                try {
+                    Member findMember = ms.searchOne(loginMember.getMemberId());
+
+                    if (findMember != null) {
+                        ms.delete(findMember.getId());
+                        return ResponseEntity.status(HttpStatus.OK).body("Delete Member Success");
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
+    }
+
     /**
      * Login
      *
