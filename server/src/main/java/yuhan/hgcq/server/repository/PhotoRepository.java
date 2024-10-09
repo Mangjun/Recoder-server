@@ -62,7 +62,7 @@ public class PhotoRepository {
                 .getResultList();
     }
 
-    public void deleteAll(Album album) {
+    public void deleteByAlbum(Album album) {
         em.createQuery("delete from Photo p where p.album = :album")
                 .setParameter("album", album)
                 .executeUpdate();

@@ -48,29 +48,6 @@ public class S3PhotoService implements PhotoService {
     private String bucketName;
 
     /**
-     * Upload photo
-     *
-     * @param photo photo
-     * @return photoId
-     * @throws IllegalArgumentException Argument is wrong
-     */
-    @Override
-    @Transactional
-    public Long savePhoto(Photo photo) throws IllegalArgumentException {
-        ensureNotNull(photo, "Photo");
-
-        Long saveId = pr.save(photo);
-        log.info("Save Photo : {}", photo);
-        return saveId;
-    }
-
-    @Override
-    @Transactional
-    public void savePhoto(Album album, String path, String region, String create) throws IOException {
-
-    }
-
-    /**
      * Upload photoList
      *
      * @param form photoList
@@ -101,6 +78,7 @@ public class S3PhotoService implements PhotoService {
             }
 
             String key = "images/" + albumId + "/" + name;
+            String thumbnailKey = "thumbnails/" + albumId + "/" + name;
 
             try (InputStream inputStream = file.getInputStream()) {
                 s3Operations.upload(bucketName, key, inputStream,
@@ -109,6 +87,14 @@ public class S3PhotoService implements PhotoService {
                 pr.save(photo);
                 log.info("Save Photo : {}", photo);
             } catch (IOException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            try(InputStream inputStream = createThumbnailInputStream(file)) {
+                s3Operations.upload(bucketName, thumbnailKey, inputStream,
+                        ObjectMetadata.builder().contentType(file.getContentType()).build());
+            } catch (IOException e) {
+                log.error("Save Thumbnail Error");
                 throw new IOException(e.getMessage());
             }
         }
@@ -290,6 +276,7 @@ public class S3PhotoService implements PhotoService {
                 }
 
                 String key = "images/" + albumId + "/" + name;
+                String thumbnailKey = "thumbnails/" + albumId + "/" + name;
 
                 try (InputStream inputStream = file.getInputStream()) {
                     s3Operations.upload(bucketName, key, inputStream,
@@ -301,14 +288,16 @@ public class S3PhotoService implements PhotoService {
                     log.error("AutoSave Photo Error");
                     throw new IOException(e.getMessage());
                 }
+
+                try(InputStream inputStream = createThumbnailInputStream(file)) {
+                    s3Operations.upload(bucketName, thumbnailKey, inputStream,
+                            ObjectMetadata.builder().contentType(file.getContentType()).build());
+                } catch (IOException e) {
+                    log.error("Save Thumbnail Error");
+                    throw new IOException(e.getMessage());
+                }
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public void autoSave(Team team, String path, String region, String create) throws IOException {
-
     }
 
     /**

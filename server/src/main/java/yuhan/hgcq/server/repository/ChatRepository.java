@@ -36,6 +36,12 @@ public class ChatRepository {
                 .executeUpdate();
     }
 
+    public void deleteByAlbum(Album album) {
+        em.createQuery("delete from Chat c where c.album = :album")
+                .setParameter("album", album)
+                .executeUpdate();
+    }
+
     public Chat findOne(Long id) {
         return em.find(Chat.class, id);
     }

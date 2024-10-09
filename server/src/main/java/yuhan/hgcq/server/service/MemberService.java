@@ -141,35 +141,6 @@ public class MemberService {
     }
 
     /**
-     * Find member by email
-     *
-     * @param email email
-     * @return member
-     * @throws IllegalArgumentException Argument is wrong
-     */
-    public Member searchByEmail(String email) throws IllegalArgumentException {
-        Member fm = mr.findOne(email);
-
-        if (fm == null) {
-            throw new IllegalArgumentException("Member Not Found");
-        }
-
-        return fm;
-    }
-
-    /**
-     * Find member by name
-     *
-     * @param name name
-     * @return member
-     * @throws IllegalArgumentException Argument is wrong
-     */
-    public List<Member> searchByName(String name) throws IllegalArgumentException {
-        return mr.findByName(name);
-    }
-
-
-    /**
      * Find memberList
      *
      * @return memberList

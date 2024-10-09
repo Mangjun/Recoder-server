@@ -11,8 +11,6 @@ import yuhan.hgcq.server.domain.Member;
 import yuhan.hgcq.server.domain.Photo;
 import yuhan.hgcq.server.dto.member.MemberDTO;
 import yuhan.hgcq.server.dto.photo.*;
-import yuhan.hgcq.server.kafka.producer.PhotoAutoSaveProducer;
-import yuhan.hgcq.server.kafka.producer.PhotoUploadProducer;
 import yuhan.hgcq.server.service.AlbumService;
 import yuhan.hgcq.server.service.LikedService;
 import yuhan.hgcq.server.service.MemberService;
@@ -31,8 +29,6 @@ public class PhotoController {
     private final AlbumService as;
     private final PhotoService ps;
     private final LikedService ls;
-//    private final PhotoUploadProducer up;
-//    private final PhotoAutoSaveProducer asp;
 
     /**
      * Upload photo
@@ -58,29 +54,6 @@ public class PhotoController {
 
                             if (fa != null) {
                                 try {
-//                                    List<MultipartFile> files = form.getFiles();
-//                                    List<String> paths = new ArrayList<>();
-//
-//                                    for (MultipartFile file : files) {
-//                                        try {
-//                                            String tempPath = FileStorageUtil.saveFile(file);
-//                                            paths.add(tempPath);
-//                                        } catch (IOException e) {
-//                                            for (String path : paths) {
-//                                                FileStorageUtil.deleteFile(path);
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    PhotoUploadMessage message = new PhotoUploadMessage(
-//                                            fa.getId(),
-//                                            findMember.getId(),
-//                                            paths,
-//                                            form.getCreates(),
-//                                            form.getRegions()
-//                                    );
-//
-//                                    up.sendUploadPhotoMessage(message);
                                     ps.savePhoto(form);
                                     return ResponseEntity.status(HttpStatus.CREATED).body("Upload Photo Success");
                                 } catch (IOException e) {
@@ -269,29 +242,6 @@ public class PhotoController {
 
                     if (findMember != null) {
                         try {
-//                            List<MultipartFile> files = form.getFiles();
-//                            List<String> paths = new ArrayList<>();
-//
-//                            for (MultipartFile file : files) {
-//                                try {
-//                                    String tempPath = FileStorageUtil.saveFile(file);
-//                                    paths.add(tempPath);
-//                                } catch (IOException e) {
-//                                    for (String path : paths) {
-//                                        FileStorageUtil.deleteFile(path);
-//                                    }
-//                                }
-//                            }
-//
-//                            PhotoAutoSaveMessage message = new PhotoAutoSaveMessage(
-//                                    form.getTeamId(),
-//                                    findMember.getId(),
-//                                    paths,
-//                                    form.getCreates(),
-//                                    form.getRegions()
-//                            );
-//
-//                            asp.sendAutoSavePhotoMessage(message);
                             ps.autoSave(form);
                             return ResponseEntity.status(HttpStatus.OK).body("Autosave Photo Success");
                         } catch (IOException e) {

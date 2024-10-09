@@ -11,8 +11,6 @@ import java.util.List;
 
 public interface PhotoService {
 
-    Long savePhoto(Photo photo) throws IllegalArgumentException;
-    void savePhoto(Album album, String path, String region, String create) throws IOException;
     void savePhoto(UploadPhotoForm form) throws IOException, IllegalArgumentException;
     void deletePhoto(Photo photo) throws IllegalArgumentException;
     void deleteCancelPhoto(Photo photo) throws IllegalArgumentException;
@@ -22,6 +20,5 @@ public interface PhotoService {
     List<Photo> searchAll(Album album) throws IllegalArgumentException;
     List<Photo> searchTrashList(Album album) throws IllegalArgumentException;
     void autoSave(AutoSavePhotoForm form) throws IOException;
-    void autoSave(Team team, String path, String region, String create) throws IOException;
     void move(Album newAlbum, List<Photo> photos) throws IOException, IllegalArgumentException;
 }

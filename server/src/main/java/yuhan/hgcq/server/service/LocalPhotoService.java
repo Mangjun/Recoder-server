@@ -44,44 +44,6 @@ public class LocalPhotoService implements PhotoService {
             + "images" + File.separator;
 
     /**
-     * Upload photo
-     *
-     * @param photo photo
-     * @return photoId
-     * @throws IllegalArgumentException Argument is wrong
-     */
-    @Transactional
-    public Long savePhoto(Photo photo) throws IllegalArgumentException {
-        ensureNotNull(photo, "Photo");
-
-        Long saveId = pr.save(photo);
-        log.info("Save Photo : {}", photo);
-        return saveId;
-    }
-
-    @Transactional
-    public void savePhoto(Album album, String path, String region, String create) throws IOException {
-        Path tempPath = Paths.get(path);
-        Long albumId = album.getId();
-
-        if (!Files.exists(tempPath)) {
-            throw new IOException("Temp file does not exist");
-        }
-
-        String dirPath = DIRECTORY_PATH + albumId + File.separator;
-        String name = tempPath.getFileName().toString();
-        Path newPath = Paths.get(dirPath + name);
-
-        Files.move(tempPath, newPath, StandardCopyOption.REPLACE_EXISTING);
-
-        String imagePath = "/images/" + albumId + "/" + name;
-        Photo p = new Photo(album, name, imagePath, region, LocalDateTime.parse(create));
-
-        pr.save(p);
-        log.info("Save Photo : {}", p);
-    }
-
-    /**
      * Upload photoList
      *
      * @param form photoList
@@ -320,68 +282,6 @@ public class LocalPhotoService implements PhotoService {
                     log.error("AutoSave Photo Error");
                     throw new IOException();
                 }
-            }
-        }
-    }
-
-    @Transactional
-    public void autoSave(Team team, String path, String region, String create) throws IOException {
-        Set<String> albumNames = ar.findAlbumName(team);
-
-        Album fa = null;
-
-        if (region.equals("null")) {
-            if (albumNames.contains("위치 정보 없음")) {
-                fa = ar.findOneByName(team, "위치 정보 없음");
-            } else {
-                Album album = new Album(team, "위치 정보 없음");
-                Long saveId = ar.save(album);
-                log.info("Save Album : {}", album);
-                fa = ar.findOne(saveId);
-                albumNames.add(fa.getName());
-            }
-        } else if (albumNames.contains(region)) {
-            fa = ar.findOneByName(team, region);
-        } else {
-            Album album = new Album(team, region);
-            Long saveId = ar.save(album);
-            log.info("Save Album : {}", album);
-            fa = ar.findOne(saveId);
-            albumNames.add(fa.getName());
-        }
-
-        if (fa != null) {
-            try {
-                List<String> nameList = pr.findNameAll(fa);
-                Path tempPath = Paths.get(path);
-                Long albumId = fa.getId();
-
-                if (!Files.exists(tempPath)) {
-                    throw new IOException("Temp file does not exist");
-                }
-
-                String dirPath = DIRECTORY_PATH + albumId + File.separator;
-                String name = tempPath.getFileName().toString();
-                Path newPath = Paths.get(dirPath + name);
-
-                File dir = new File(dirPath);
-
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-
-                if (nameList.contains(name)) {
-                    return;
-                }
-
-                Files.move(tempPath, newPath, StandardCopyOption.REPLACE_EXISTING);
-
-                String imagePath = "/images/" + albumId + "/" + name;
-                Photo p = new Photo(fa, name, imagePath, region, LocalDateTime.parse(create));
-
-                pr.save(p);
-            } catch (IOException e) {
-                throw new IOException(e.getMessage());
             }
         }
     }

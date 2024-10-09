@@ -9,8 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import yuhan.hgcq.server.domain.Album;
 import yuhan.hgcq.server.domain.Member;
 import yuhan.hgcq.server.domain.Team;
-import yuhan.hgcq.server.repository.AlbumRepository;
-import yuhan.hgcq.server.repository.TeamMemberRepository;
+import yuhan.hgcq.server.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +23,9 @@ public class AlbumService {
     private static final Logger log = LoggerFactory.getLogger(AlbumService.class);
 
     private final AlbumRepository ar;
+    private final ChatRepository cr;
+    private final LikedRepository lr;
+    private final PhotoRepository pr;
     private final TeamMemberRepository tmr;
 
     private final static int DELETE_DAY = 30;
@@ -135,6 +137,9 @@ public class AlbumService {
             long between = ChronoUnit.DAYS.between(deletedAt, now);
 
             if (between >= DELETE_DAY) {
+                lr.deleteByAlbum(album);
+                pr.deleteByAlbum(album);
+                cr.deleteByAlbum(album);
                 ar.delete(album.getId());
                 log.info("Complete Delete Album : {}", album);
             }

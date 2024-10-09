@@ -5,10 +5,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import yuhan.hgcq.server.domain.Liked;
-import yuhan.hgcq.server.domain.Member;
-import yuhan.hgcq.server.domain.Photo;
-import yuhan.hgcq.server.domain.Team;
+import yuhan.hgcq.server.domain.*;
 
 import java.util.List;
 
@@ -42,6 +39,12 @@ public class LikedRepository {
     public void deleteByTeam(Team team) {
         em.createQuery("delete from Liked l where l.photo.album.team = :team")
                 .setParameter("team", team)
+                .executeUpdate();
+    }
+
+    public void deleteByAlbum(Album album) {
+        em.createQuery("delete from Liked l where l.photo.album = :album")
+                .setParameter("album", album)
                 .executeUpdate();
     }
 

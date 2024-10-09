@@ -16,11 +16,8 @@ import yuhan.hgcq.server.domain.TeamMember;
 import yuhan.hgcq.server.dto.photo.UploadTeamForm;
 import yuhan.hgcq.server.repository.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -39,9 +36,6 @@ public class TeamService {
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
-
-    @Value("${spring.cloud.aws.region.static}")
-    private String region;
 
     /**
      * Create Team
