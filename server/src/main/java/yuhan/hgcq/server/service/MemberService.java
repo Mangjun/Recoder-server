@@ -3,7 +3,6 @@ package yuhan.hgcq.server.service;
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +16,6 @@ import yuhan.hgcq.server.dto.member.SignupForm;
 import yuhan.hgcq.server.dto.photo.UploadMemberForm;
 import yuhan.hgcq.server.repository.MemberRepository;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -223,15 +220,5 @@ public class MemberService {
         if (obj == null) {
             throw new IllegalArgumentException(name + " is null");
         }
-    }
-
-    private InputStream createThumbnailInputStream(MultipartFile file) throws IOException {
-        ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
-        Thumbnails.of(file.getInputStream())
-                .size(150, 150)
-                .outputFormat("jpg")
-                .toOutputStream(thumbnailOutputStream);
-        byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
-        return new ByteArrayInputStream(thumbnailBytes);
     }
 }

@@ -80,21 +80,28 @@ public class S3PhotoService implements PhotoService {
             String key = "images/" + albumId + "/" + name;
             String thumbnailKey = "thumbnails/" + albumId + "/" + name;
 
-            try (InputStream inputStream = file.getInputStream()) {
-                s3Operations.upload(bucketName, key, inputStream,
-                        ObjectMetadata.builder().contentType(file.getContentType()).build());
-                Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
-                pr.save(photo);
-                log.info("Save Photo : {}", photo);
-            } catch (IOException e) {
-                throw new IOException(e.getMessage());
-            }
+            try {
+                byte[] fileBytes = file.getBytes();
 
-            try(InputStream inputStream = createThumbnailInputStream(file)) {
-                s3Operations.upload(bucketName, thumbnailKey, inputStream,
-                        ObjectMetadata.builder().contentType(file.getContentType()).build());
+                try (InputStream originalInputStream = new ByteArrayInputStream(fileBytes)) {
+                    s3Operations.upload(bucketName, key, originalInputStream,
+                            ObjectMetadata.builder().contentType(file.getContentType()).build());
+                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
+                    pr.save(photo);
+                    log.info("Save Photo : {}", photo);
+                } catch (IOException e) {
+                    throw new IOException(e.getMessage());
+                }
+
+                InputStream thumbnailInputStream = createThumbnailInputStream(fileBytes);
+                byte[] thumbnailBytes = thumbnailInputStream.readAllBytes();
+
+                try (InputStream thumbnailStream = new ByteArrayInputStream(thumbnailBytes)) {
+                    s3Operations.upload(bucketName, thumbnailKey,
+                            thumbnailStream, ObjectMetadata.builder().contentType("image/jpeg").build());
+                    log.info("Save Thumbnail");
+                }
             } catch (IOException e) {
-                log.error("Save Thumbnail Error");
                 throw new IOException(e.getMessage());
             }
         }
@@ -239,16 +246,17 @@ public class S3PhotoService implements PhotoService {
         List<String> regions = form.getRegions();
 
         int size = files.size();
+        String noRegion = "위치정보없음";
 
         for (int i = 0; i < size; i++) {
             String region = regions.get(i);
             Album fa = null;
 
             if (region.equals("null")) {
-                if (albumNames.contains("위치정보없음")) {
-                    fa = ar.findOneByName(ft, "위치정보없음");
+                if (albumNames.contains(noRegion)) {
+                    fa = ar.findOneByName(ft, noRegion);
                 } else {
-                    Album album = new Album(ft, "위치정보없음");
+                    Album album = new Album(ft, noRegion);
                     Long saveId = ar.save(album);
                     log.info("Save Album : {}", album);
                     fa = ar.findOne(saveId);
@@ -278,22 +286,28 @@ public class S3PhotoService implements PhotoService {
                 String key = "images/" + albumId + "/" + name;
                 String thumbnailKey = "thumbnails/" + albumId + "/" + name;
 
-                try (InputStream inputStream = file.getInputStream()) {
-                    s3Operations.upload(bucketName, key, inputStream,
-                            ObjectMetadata.builder().contentType(file.getContentType()).build());
-                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
-                    pr.save(photo);
-                    log.info("AutoSave Photo : {}", photo);
-                } catch (IOException e) {
-                    log.error("AutoSave Photo Error");
-                    throw new IOException(e.getMessage());
-                }
+                try {
+                    byte[] fileBytes = file.getBytes();
 
-                try(InputStream inputStream = createThumbnailInputStream(file)) {
-                    s3Operations.upload(bucketName, thumbnailKey, inputStream,
-                            ObjectMetadata.builder().contentType(file.getContentType()).build());
+                    try (InputStream originalInputStream = new ByteArrayInputStream(fileBytes)) {
+                        s3Operations.upload(bucketName, key, originalInputStream,
+                                ObjectMetadata.builder().contentType(file.getContentType()).build());
+                        Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
+                        pr.save(photo);
+                        log.info("AutoSave Photo : {}", photo);
+                    } catch (IOException e) {
+                        throw new IOException(e.getMessage());
+                    }
+
+                    InputStream thumbnailInputStream = createThumbnailInputStream(fileBytes);
+                    byte[] thumbnailBytes = thumbnailInputStream.readAllBytes();
+
+                    try (InputStream thumbnailStream = new ByteArrayInputStream(thumbnailBytes)) {
+                        s3Operations.upload(bucketName, thumbnailKey,
+                                thumbnailStream, ObjectMetadata.builder().contentType("image/jpeg").build());
+                        log.info("Save Thumbnail");
+                    }
                 } catch (IOException e) {
-                    log.error("Save Thumbnail Error");
                     throw new IOException(e.getMessage());
                 }
             }
@@ -342,9 +356,9 @@ public class S3PhotoService implements PhotoService {
         }
     }
 
-    private InputStream createThumbnailInputStream(MultipartFile file) throws IOException {
+    private InputStream createThumbnailInputStream(byte[] fileBytes) throws IOException {
         ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
-        Thumbnails.of(file.getInputStream())
+        Thumbnails.of(new ByteArrayInputStream(fileBytes))
                 .size(150, 150)
                 .outputFormat("jpg")
                 .toOutputStream(thumbnailOutputStream);
