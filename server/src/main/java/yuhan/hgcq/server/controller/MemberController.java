@@ -370,12 +370,39 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
+    @PostMapping("/searched")
+    public ResponseEntity<?> searched(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            MemberDTO loginMember = (MemberDTO) session.getAttribute("member");
+
+            if (loginMember != null) {
+                try {
+                    Member findMember = ms.searchOne(loginMember.getMemberId());
+
+                    if (findMember != null) {
+                        ms.toggleSearched(findMember);
+                        MemberDTO memberDTO = mapping(findMember);
+                        session.setAttribute("member", memberDTO);
+                        return ResponseEntity.status(HttpStatus.OK).body(memberDTO);
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
+    }
+
     private MemberDTO mapping(Member member) {
         MemberDTO dto = new MemberDTO();
         dto.setMemberId(member.getId());
         dto.setName(member.getName());
         dto.setEmail(member.getEmail());
         dto.setImage(member.getImage());
+        dto.setSearch(member.getSearch());
         return dto;
     }
 }

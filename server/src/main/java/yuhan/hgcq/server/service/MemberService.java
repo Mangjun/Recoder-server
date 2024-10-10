@@ -210,6 +210,13 @@ public class MemberService {
         }
     }
 
+    @Transactional
+    public void toggleSearched(Member member) {
+        member.changeSearch();
+        mr.save(member);
+        log.info("Change Search : {}", member);
+    }
+
     /**
      * Argument Check if Null
      *

@@ -273,6 +273,52 @@ public class AlbumController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
+    @GetMapping("/list/teamId/albumId")
+    public ResponseEntity<?> listMoveAlbums(@RequestParam("teamId") Long teamId, @RequestParam("albumId") Long albumId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            MemberDTO loginMember = (MemberDTO) session.getAttribute("member");
+
+            if (loginMember != null) {
+                try {
+                    Member findMember = ms.searchOne(loginMember.getMemberId());
+
+                    if (findMember != null) {
+                        try {
+                            Team ft = ts.searchOne(teamId);
+
+                            if (ft != null) {
+                                try {
+                                    Album fa = as.searchOne(albumId);
+                                    List<Album> albumList = as.searchAll(ft);
+                                    albumList.remove(fa);
+
+                                    List<AlbumDTO> albumDTOList = new ArrayList<>();
+
+                                    for (Album album : albumList) {
+                                        AlbumDTO albumDTO = mapping(album);
+                                        albumDTOList.add(albumDTO);
+                                    }
+
+                                    return ResponseEntity.status(HttpStatus.OK).body(albumDTOList);
+                                } catch (IllegalArgumentException e) {
+                                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                                }
+                            }
+                        } catch (IllegalArgumentException e) {
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
+    }
+
     /**
      * Find albumList by name
      *

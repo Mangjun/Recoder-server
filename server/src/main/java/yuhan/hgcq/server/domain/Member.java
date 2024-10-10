@@ -26,6 +26,8 @@ public class Member {
 
     private String image;
 
+    private Boolean search;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Team> owners = new ArrayList<>();
 
@@ -39,6 +41,7 @@ public class Member {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.search = false;
     }
 
     public void changeName(String name) {
@@ -53,13 +56,17 @@ public class Member {
         this.image = image;
     }
 
+    public void changeSearch() {
+        this.search = !search;
+    }
+
     @Override
     public String toString() {
         return "Member{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", image='" + image + '\'' +
+                ", search=" + search +
                 '}';
     }
 }
