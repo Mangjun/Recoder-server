@@ -50,7 +50,7 @@ public class MemberRepository {
     }
 
     public List<Member> findAll() {
-        return em.createQuery("select m from Member m order by m.name", Member.class)
+        return em.createQuery("select m from Member m where m.search = true order by m.name", Member.class)
                 .getResultList();
     }
 
