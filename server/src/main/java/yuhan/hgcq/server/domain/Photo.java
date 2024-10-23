@@ -27,9 +27,7 @@ public class Photo {
     private Boolean isDeleted;
     private LocalDateTime deleted;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
@@ -43,7 +41,7 @@ public class Photo {
         }
     }
 
-    public Photo(Album album, String name, String path, String region, LocalDateTime created, Member member) {
+    public Photo(Album album, String name, String path, String region, LocalDateTime created, String member) {
         if (album == null || path == null) {
             throw new NullPointerException("Album or Path cannot be null");
         }

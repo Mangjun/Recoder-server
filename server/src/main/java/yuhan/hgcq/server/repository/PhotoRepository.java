@@ -17,7 +17,7 @@ public class PhotoRepository {
     @PersistenceContext
     private final EntityManager em;
 
-    public synchronized Long save(Photo photo) {
+    public Long save(Photo photo) {
         if (photo.getId() == null) {
             em.persist(photo);
         } else {

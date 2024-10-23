@@ -80,7 +80,7 @@ public class S3PhotoService implements PhotoService {
             try (InputStream inputStream = file.getInputStream()) {
                 s3Operations.upload(bucketName, key, inputStream,
                         ObjectMetadata.builder().contentType(file.getContentType()).build());
-                Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)), member);
+                Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)), member.getName());
                 pr.save(photo);
                 log.info("Save Photo : {}", photo);
             } catch (IOException e) {
@@ -270,7 +270,7 @@ public class S3PhotoService implements PhotoService {
                 try (InputStream inputStream = file.getInputStream()) {
                     s3Operations.upload(bucketName, key, inputStream,
                             ObjectMetadata.builder().contentType(file.getContentType()).build());
-                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)), member);
+                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)), member.getName());
                     pr.save(photo);
                     log.info("AutoSave Photo : {}", photo);
                 } catch (IOException e) {
