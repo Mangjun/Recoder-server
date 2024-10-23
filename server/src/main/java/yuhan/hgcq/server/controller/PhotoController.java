@@ -430,7 +430,7 @@ public class PhotoController {
         dto.setRegion(photo.getRegion());
         dto.setName(photo.getName());
         dto.setPath(photo.getPath());
-        dto.setMember(photo.getMember().getName());
+        dto.setMember(photo.getMember());
         return dto;
     }
 }
