@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import yuhan.hgcq.server.domain.Album;
+import yuhan.hgcq.server.domain.Member;
 import yuhan.hgcq.server.domain.Photo;
 import yuhan.hgcq.server.domain.Team;
 import yuhan.hgcq.server.dto.photo.AutoSavePhotoForm;
@@ -53,7 +54,7 @@ public class S3PhotoService implements PhotoService {
      */
     @Override
     @Transactional
-    public void savePhoto(UploadPhotoForm form) throws IOException, IllegalArgumentException {
+    public void savePhoto(UploadPhotoForm form, Member member) throws IOException, IllegalArgumentException {
         Long albumId = form.getAlbumId();
         List<MultipartFile> files = form.getFiles();
         List<String> regions = form.getRegions();
@@ -79,7 +80,7 @@ public class S3PhotoService implements PhotoService {
             try (InputStream inputStream = file.getInputStream()) {
                 s3Operations.upload(bucketName, key, inputStream,
                         ObjectMetadata.builder().contentType(file.getContentType()).build());
-                Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
+                Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)), member);
                 pr.save(photo);
                 log.info("Save Photo : {}", photo);
             } catch (IOException e) {
@@ -217,7 +218,7 @@ public class S3PhotoService implements PhotoService {
      */
     @Override
     @Transactional
-    public void autoSave(AutoSavePhotoForm form) throws IOException {
+    public void autoSave(AutoSavePhotoForm form, Member member) throws IOException {
         Long teamId = form.getTeamId();
         Team ft = tr.findOne(teamId);
 
@@ -269,7 +270,7 @@ public class S3PhotoService implements PhotoService {
                 try (InputStream inputStream = file.getInputStream()) {
                     s3Operations.upload(bucketName, key, inputStream,
                             ObjectMetadata.builder().contentType(file.getContentType()).build());
-                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)));
+                    Photo photo = new Photo(fa, name, key, regions.get(i), LocalDateTime.parse(creates.get(i)), member);
                     pr.save(photo);
                     log.info("AutoSave Photo : {}", photo);
                 } catch (IOException e) {

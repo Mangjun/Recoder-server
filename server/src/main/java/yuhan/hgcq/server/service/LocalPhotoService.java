@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import yuhan.hgcq.server.domain.Album;
+import yuhan.hgcq.server.domain.Member;
 import yuhan.hgcq.server.domain.Photo;
 import yuhan.hgcq.server.domain.Team;
 import yuhan.hgcq.server.dto.photo.AutoSavePhotoForm;
@@ -51,7 +52,7 @@ public class LocalPhotoService implements PhotoService {
      * @throws IllegalArgumentException Argument is wrong
      */
     @Transactional
-    public void savePhoto(UploadPhotoForm form) throws IOException, IllegalArgumentException {
+    public void savePhoto(UploadPhotoForm form, Member member) throws IOException, IllegalArgumentException {
         List<MultipartFile> files = form.getFiles();
         List<String> creates = form.getCreates();
         List<String> regions = form.getRegions();
@@ -86,10 +87,10 @@ public class LocalPhotoService implements PhotoService {
                 file.transferTo(path);
                 String imagePath = "/images/" + albumId + "/" + name;
 
-                Photo p = new Photo(fa, name, imagePath, region, LocalDateTime.parse(create));
-                pr.save(p);
-
-                log.info("Save Photos : {}", p);
+//                Photo p = new Photo(fa, name, imagePath, region, LocalDateTime.parse(create));
+//                pr.save(p);
+//
+//                log.info("Save Photos : {}", p);
             }
         } catch (IOException e) {
             log.error("Upload Photo Error");
@@ -216,7 +217,7 @@ public class LocalPhotoService implements PhotoService {
      * @throws IOException Upload error
      */
     @Transactional
-    public void autoSave(AutoSavePhotoForm form) throws IOException {
+    public void autoSave(AutoSavePhotoForm form, Member member) throws IOException {
         Long teamId = form.getTeamId();
         Team ft = tr.findOne(teamId);
 
@@ -274,10 +275,10 @@ public class LocalPhotoService implements PhotoService {
                     file.transferTo(path);
                     String imagePath = "/images/" + albumId + "/" + name;
 
-                    Photo p = new Photo(fa, name, imagePath, region, LocalDateTime.parse(creates.get(i)));
-                    pr.save(p);
-
-                    log.info("AutoSave Photo : {}", p);
+//                    Photo p = new Photo(fa, name, imagePath, region, LocalDateTime.parse(creates.get(i)));
+//                    pr.save(p);
+//
+//                    log.info("AutoSave Photo : {}", p);
                 } catch (IOException e) {
                     log.error("AutoSave Photo Error");
                     throw new IOException();

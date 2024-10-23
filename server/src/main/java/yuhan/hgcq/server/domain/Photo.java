@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Photo {
     @Id @GeneratedValue
     @Column(name = "photo_id")
@@ -26,6 +27,10 @@ public class Photo {
     private Boolean isDeleted;
     private LocalDateTime deleted;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
     private Album album;
@@ -38,7 +43,7 @@ public class Photo {
         }
     }
 
-    public Photo(Album album, String name, String path, String region, LocalDateTime created) {
+    public Photo(Album album, String name, String path, String region, LocalDateTime created, Member member) {
         if (album == null || path == null) {
             throw new NullPointerException("Album or Path cannot be null");
         }
@@ -47,6 +52,7 @@ public class Photo {
         this.path = path;
         this.region = region;
         this.created = created;
+        this.member = member;
         this.isDeleted = false;
     }
 
@@ -67,22 +73,5 @@ public class Photo {
     public void changeAlbum(Album album, String path) {
         this.album = album;
         this.path = path;
-    }
-
-    /* 테스트 코드(나중에 삭제) */
-    public void test(LocalDateTime date) {
-        deleted = date;
-    }
-
-    @Override
-    public String toString() {
-        return "Photo{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", path='" + path + '\'' +
-                ", created=" + created +
-                ", isDeleted=" + isDeleted +
-                ", deleted=" + deleted +
-                '}';
     }
 }

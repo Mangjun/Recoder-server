@@ -54,7 +54,7 @@ public class PhotoController {
 
                             if (fa != null) {
                                 try {
-                                    ps.savePhoto(form);
+                                    ps.savePhoto(form, findMember);
                                     return ResponseEntity.status(HttpStatus.CREATED).body("Upload Photo Success");
                                 } catch (IOException e) {
                                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -242,7 +242,7 @@ public class PhotoController {
 
                     if (findMember != null) {
                         try {
-                            ps.autoSave(form);
+                            ps.autoSave(form, findMember);
                             return ResponseEntity.status(HttpStatus.OK).body("Autosave Photo Success");
                         } catch (IOException e) {
                             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -430,6 +430,7 @@ public class PhotoController {
         dto.setRegion(photo.getRegion());
         dto.setName(photo.getName());
         dto.setPath(photo.getPath());
+        dto.setMember(photo.getMember().getName());
         return dto;
     }
 }
