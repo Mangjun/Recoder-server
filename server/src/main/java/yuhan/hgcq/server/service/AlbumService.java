@@ -124,6 +124,22 @@ public class AlbumService {
         }
     }
 
+    @Transactional
+    public void removeAlbum(Member member, Album album) throws AccessException, IllegalArgumentException {
+        ensureNotNull(member, "Member");
+        ensureNotNull(album, "Album");
+
+        boolean isAdmin = isAdmin(member, album);
+        if (isAdmin) {
+            if (album.getIsDeleted()) {
+                ar.delete(album.getId());
+                log.info("Remove Album : {}", album);
+            }
+        } else {
+            throw new AccessException("Don't have Permission");
+        }
+    }
+
     /**
      * Trash empty
      *

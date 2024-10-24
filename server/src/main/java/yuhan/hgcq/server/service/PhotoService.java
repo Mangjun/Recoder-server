@@ -15,6 +15,7 @@ public interface PhotoService {
     void savePhoto(UploadPhotoForm form, Member member) throws IOException, IllegalArgumentException;
     void deletePhoto(Photo photo) throws IllegalArgumentException;
     void deleteCancelPhoto(Photo photo) throws IllegalArgumentException;
+    void removePhoto(Photo photo) throws IllegalArgumentException;
     void trash(List<Photo> photos);
     Photo searchOne(Long id) throws IllegalArgumentException;
     Photo searchOne(String path) throws IllegalArgumentException;

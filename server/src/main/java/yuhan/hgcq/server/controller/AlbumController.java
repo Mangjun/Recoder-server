@@ -171,6 +171,47 @@ public class AlbumController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
+    @PostMapping("/remove")
+    public ResponseEntity<?> removeAlbum(@RequestBody DeleteCancelAlbumForm form, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            MemberDTO loginMember = (MemberDTO) session.getAttribute("member");
+
+            if (loginMember != null) {
+                try {
+                    Member findMember = ms.searchOne(loginMember.getMemberId());
+
+                    if (findMember != null) {
+                        try {
+                            List<Long> albumIds = form.getAlbumIds();
+                            for (Long albumId : albumIds) {
+                                Album fa = as.searchOne(albumId);
+
+                                if (fa != null) {
+                                    try {
+                                        as.removeAlbum(findMember, fa);
+                                    } catch (AccessException e) {
+                                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+                                    } catch (IllegalArgumentException e) {
+                                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                                    }
+                                }
+                            }
+                            return ResponseEntity.status(HttpStatus.OK).body("Remove Album Success");
+                        } catch (IllegalArgumentException e) {
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
+    }
+
     /**
      * Update album information
      *

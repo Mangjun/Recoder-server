@@ -131,6 +131,10 @@ public class LocalPhotoService implements PhotoService {
         log.info("Delete Cancel Photo : {}", photo);
     }
 
+    public void removePhoto(Photo photo) throws IllegalArgumentException {
+
+    }
+
     /**
      * Trash empty
      *

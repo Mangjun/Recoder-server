@@ -165,6 +165,46 @@ public class PhotoController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
+    @PostMapping("/remove")
+    public ResponseEntity<?> removePhoto(@RequestBody DeleteCancelPhotoForm form, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            MemberDTO loginMember = (MemberDTO) session.getAttribute("member");
+
+            if (loginMember != null) {
+                try {
+                    Member findMember = ms.searchOne(loginMember.getMemberId());
+
+                    if (findMember != null) {
+                        try {
+                            List<Long> photoIds = form.getPhotoIds();
+
+                            for (Long photoId : photoIds) {
+                                Photo fp = ps.searchOne(photoId);
+
+                                if (fp != null) {
+                                    try {
+                                        ps.removePhoto(fp);
+                                    } catch (IllegalArgumentException e) {
+                                        return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+                                    }
+                                }
+                            }
+                            return ResponseEntity.status(HttpStatus.OK).body("Remove Photo Success");
+                        } catch (IllegalArgumentException e) {
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
+    }
+
     /**
      * Move photo
      *

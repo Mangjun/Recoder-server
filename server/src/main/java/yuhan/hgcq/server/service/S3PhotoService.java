@@ -124,6 +124,19 @@ public class S3PhotoService implements PhotoService {
         log.info("Delete Cancel Photo : {}", photo);
     }
 
+    @Override
+    @Transactional
+    public void removePhoto(Photo photo) throws IllegalArgumentException {
+        ensureNotNull(photo, "Photo");
+
+        if (photo.getIsDeleted()) {
+            String key = photo.getPath();
+            s3Operations.deleteObject(bucketName, key);
+            pr.delete(photo.getId());
+            log.info("Remove Photo : {}", photo);
+        }
+    }
+
     /**
      * Trash empty
      *
