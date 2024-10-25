@@ -132,6 +132,9 @@ public class AlbumService {
         boolean isAdmin = isAdmin(member, album);
         if (isAdmin) {
             if (album.getIsDeleted()) {
+                lr.deleteByAlbum(album);
+                pr.deleteByAlbum(album);
+                cr.deleteByAlbum(album);
                 ar.delete(album.getId());
                 log.info("Remove Album : {}", album);
             }

@@ -48,6 +48,12 @@ public class LikedRepository {
                 .executeUpdate();
     }
 
+    public void deleteByPhoto(Photo photo) {
+        em.createQuery("delete from Liked l where l.photo = :photo")
+                .setParameter("photo", photo)
+                .executeUpdate();
+    }
+
     public void update(Liked liked) {
         em.merge(liked);
     }

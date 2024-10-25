@@ -132,6 +132,7 @@ public class S3PhotoService implements PhotoService {
         if (photo.getIsDeleted()) {
             String key = photo.getPath();
             s3Operations.deleteObject(bucketName, key);
+            lr.deleteByPhoto(photo);
             pr.delete(photo.getId());
             log.info("Remove Photo : {}", photo);
         }
@@ -153,6 +154,7 @@ public class S3PhotoService implements PhotoService {
             if (between >= DELETE_DAY) {
                 String key = photo.getPath();
                 s3Operations.deleteObject(bucketName, key);
+                lr.deleteByPhoto(photo);
                 pr.delete(photo.getId());
                 log.info("Complete Delete Photo : {}", photo);
             }
