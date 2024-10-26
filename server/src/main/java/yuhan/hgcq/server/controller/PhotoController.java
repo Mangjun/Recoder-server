@@ -3,6 +3,7 @@ package yuhan.hgcq.server.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/photo")
@@ -384,8 +386,14 @@ public class PhotoController {
 
                                     for (Photo photo : photoList) {
                                         LocalDate create = photo.getCreated().toLocalDate();
+
+                                        log.info("start : {}", start);
+                                        log.info("end : {}", end);
+                                        log.info("create : {}", create);
+
                                         if ((create.isEqual(start) || create.isAfter(start)) &&
                                                 (create.isEqual(end) || create.isBefore(end))) {
+                                            log.info("{} between {} and {}", create, start, end);
                                             PhotoDTO dto = mapping(photo);
                                             dto.setIsLiked(likeList.contains(photo));
 
