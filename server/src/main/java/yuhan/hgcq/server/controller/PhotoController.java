@@ -357,6 +357,64 @@ public class PhotoController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
+    @GetMapping("/gallery/albumId/startDate/endDate")
+    public ResponseEntity<?> galleryByDate(@RequestParam("albumId") Long albumId
+            , @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate,
+                                           HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            MemberDTO loginMember = (MemberDTO) session.getAttribute("member");
+
+            if (loginMember != null) {
+                try {
+                    Member findMember = ms.searchOne(loginMember.getMemberId());
+
+                    if (findMember != null) {
+                        try {
+                            Album fa = as.searchOne(albumId);
+
+                            if (fa != null) {
+                                try {
+                                    LocalDate start = LocalDate.parse(startDate);
+                                    LocalDate end = LocalDate.parse(endDate);
+                                    List<Photo> photoList = ps.searchAll(fa);
+                                    List<Photo> likeList = ls.searchAll(findMember);
+                                    Map<String, List<PhotoDTO>> gallery = new HashMap<>();
+
+                                    for (Photo photo : photoList) {
+                                        LocalDate create = photo.getCreated().toLocalDate();
+                                        if ((create.isEqual(start) || create.isAfter(start)) &&
+                                                (create.isEqual(end) || create.isBefore(end))) {
+                                            PhotoDTO dto = mapping(photo);
+                                            dto.setIsLiked(likeList.contains(photo));
+
+                                            List<PhotoDTO> photoDTOList = gallery.getOrDefault(create.toString(), new ArrayList<>());
+
+                                            photoDTOList.add(dto);
+
+                                            gallery.put(create.toString(), photoDTOList);
+                                        }
+                                    }
+
+                                    return ResponseEntity.status(HttpStatus.OK).body(gallery);
+                                } catch (IllegalArgumentException e) {
+                                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                                }
+                            }
+                        } catch (IllegalArgumentException e) {
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
+    }
+
     /**
      * Find photoList
      *
