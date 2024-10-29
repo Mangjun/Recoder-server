@@ -359,9 +359,9 @@ public class PhotoController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
-    @GetMapping("/gallery/{albumId}/{startDate}/{endDate}")
-    public ResponseEntity<?> galleryByDate(@PathVariable("albumId") Long albumId
-            , @PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
+    @GetMapping("/gallery/albumId/date")
+    public ResponseEntity<?> galleryByDate(@RequestParam("albumId") Long albumId
+            , @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate,
                                            HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
