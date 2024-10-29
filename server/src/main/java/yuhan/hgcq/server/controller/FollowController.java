@@ -371,6 +371,8 @@ public class FollowController {
         dto.setMemberId(member.getId());
         dto.setName(member.getName());
         dto.setEmail(member.getEmail());
+        dto.setSearch(member.getSearch());
+        dto.setImage(member.getImage());
         return dto;
     }
 }
