@@ -359,9 +359,9 @@ public class PhotoController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Login");
     }
 
-    @GetMapping("/gallery/albumId/startDate/endDate")
-    public ResponseEntity<?> galleryByDate(@RequestParam("albumId") Long albumId
-            , @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate,
+    @GetMapping("/gallery/{albumId}/{startDate}/{endDate}")
+    public ResponseEntity<?> galleryByDate(@PathVariable("albumId") Long albumId
+            , @PathVariable("startDate") String startDate, @PathVariable("endDate") String endDate,
                                            HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
@@ -393,7 +393,6 @@ public class PhotoController {
 
                                         if ((create.isEqual(start) || create.isAfter(start)) &&
                                                 (create.isEqual(end) || create.isBefore(end))) {
-                                            log.info("{} between {} and {}", create, start, end);
                                             PhotoDTO dto = mapping(photo);
                                             dto.setIsLiked(likeList.contains(photo));
 
