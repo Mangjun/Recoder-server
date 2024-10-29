@@ -13,4 +13,5 @@ public class MemberInTeamDTO implements Serializable {
     private String name;
     private Boolean isAdmin;
     private Boolean isOwner;
+    private String image;
 }

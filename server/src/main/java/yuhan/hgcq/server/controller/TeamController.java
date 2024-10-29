@@ -688,6 +688,7 @@ public class TeamController {
         MemberInTeamDTO memberDTO = new MemberInTeamDTO();
         memberDTO.setMemberId(member.getId());
         memberDTO.setName(member.getName());
+        memberDTO.setImage(member.getImage());
         return memberDTO;
     }
 }
