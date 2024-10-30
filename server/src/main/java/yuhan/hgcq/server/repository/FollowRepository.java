@@ -24,6 +24,12 @@ public class FollowRepository {
         em.remove(follow);
     }
 
+    public void deleteByMember(Member member) {
+        em.createQuery("delete from Follow f where f.member = :member")
+                .setParameter("member", member)
+                .executeUpdate();
+    }
+
     public Follow findOne(Member member, Member follow) {
         try {
             return em.createQuery("select f from Follow f where f.member = :member and f.follow = :follow", Follow.class)

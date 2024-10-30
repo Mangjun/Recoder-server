@@ -14,6 +14,8 @@ import yuhan.hgcq.server.dto.member.LoginForm;
 import yuhan.hgcq.server.dto.member.MemberUpdateForm;
 import yuhan.hgcq.server.dto.member.SignupForm;
 import yuhan.hgcq.server.dto.photo.UploadMemberForm;
+import yuhan.hgcq.server.repository.FollowRepository;
+import yuhan.hgcq.server.repository.LikedRepository;
 import yuhan.hgcq.server.repository.MemberRepository;
 
 import java.io.IOException;
@@ -27,6 +29,8 @@ public class MemberService {
     private static final Logger log = LoggerFactory.getLogger(MemberService.class);
 
     private final MemberRepository mr;
+    private final LikedRepository lr;
+    private final FollowRepository fr;
     private final S3Operations s3Operations;
 
     @Value("${spring.cloud.aws.s3.bucket}")
@@ -62,6 +66,9 @@ public class MemberService {
 
     @Transactional
     public void delete(Long memberId) {
+        Member fm = mr.findOne(memberId);
+        lr.deleteByMember(fm);
+        fr.deleteByMember(fm);
         mr.delete(memberId);
         log.info("Delete Member : {}", memberId);
     }

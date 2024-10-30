@@ -48,6 +48,12 @@ public class LikedRepository {
                 .executeUpdate();
     }
 
+    public void deleteByMember(Member member) {
+        em.createQuery("delete from Liked l where l.member = :member")
+                .setParameter("member", member)
+                .executeUpdate();
+    }
+
     public void deleteByPhoto(Photo photo) {
         em.createQuery("delete from Liked l where l.photo = :photo")
                 .setParameter("photo", photo)
