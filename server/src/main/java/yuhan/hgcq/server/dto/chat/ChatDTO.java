@@ -13,6 +13,7 @@ public class ChatDTO implements Serializable {
     private Long albumId;
     private Long writerId;
     private String writerName;
+    private String image;
     private String message;
     private String time;
 }

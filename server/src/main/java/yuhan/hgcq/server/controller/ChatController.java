@@ -80,6 +80,7 @@ public class ChatController {
         dto.setTime(chat.getTime().toString());
         dto.setWriterId(chat.getWriter().getId());
         dto.setWriterName(chat.getWriter().getName());
+        dto.setImage(chat.getWriter().getImage());
         return dto;
     }
 }
