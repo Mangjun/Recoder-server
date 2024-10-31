@@ -169,6 +169,7 @@ public class LikedController {
         dto.setAlbumId(photo.getAlbum().getId());
         dto.setName(photo.getName());
         dto.setPath(photo.getPath());
+        dto.setMember(photo.getMember());
         dto.setCreated(photo.getCreated().toString());
         return dto;
     }
