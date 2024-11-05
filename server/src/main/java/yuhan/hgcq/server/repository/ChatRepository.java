@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import yuhan.hgcq.server.domain.Album;
 import yuhan.hgcq.server.domain.Chat;
+import yuhan.hgcq.server.domain.Member;
 import yuhan.hgcq.server.domain.Team;
 
 import java.util.List;
@@ -39,6 +40,12 @@ public class ChatRepository {
     public void deleteByAlbum(Album album) {
         em.createQuery("delete from Chat c where c.album = :album")
                 .setParameter("album", album)
+                .executeUpdate();
+    }
+
+    public void deleteByMember(Member member) {
+        em.createQuery("delete from Chat c where c.member = :member")
+                .setParameter("member", member)
                 .executeUpdate();
     }
 

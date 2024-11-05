@@ -14,6 +14,7 @@ import yuhan.hgcq.server.dto.member.LoginForm;
 import yuhan.hgcq.server.dto.member.MemberUpdateForm;
 import yuhan.hgcq.server.dto.member.SignupForm;
 import yuhan.hgcq.server.dto.photo.UploadMemberForm;
+import yuhan.hgcq.server.repository.ChatRepository;
 import yuhan.hgcq.server.repository.FollowRepository;
 import yuhan.hgcq.server.repository.LikedRepository;
 import yuhan.hgcq.server.repository.MemberRepository;
@@ -31,6 +32,7 @@ public class MemberService {
     private final MemberRepository mr;
     private final LikedRepository lr;
     private final FollowRepository fr;
+    private final ChatRepository cr;
     private final S3Operations s3Operations;
 
     @Value("${spring.cloud.aws.s3.bucket}")
@@ -68,6 +70,7 @@ public class MemberService {
     public void delete(Long memberId) {
         Member fm = mr.findOne(memberId);
         lr.deleteByMember(fm);
+        cr.deleteByMember(fm);
         fr.deleteByMember(fm);
         fr.deleteByFollow(fm);
         mr.delete(memberId);
