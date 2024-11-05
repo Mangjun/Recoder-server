@@ -69,6 +69,7 @@ public class MemberService {
         Member fm = mr.findOne(memberId);
         lr.deleteByMember(fm);
         fr.deleteByMember(fm);
+        fr.deleteByFollow(fm);
         mr.delete(memberId);
         log.info("Delete Member : {}", memberId);
     }
