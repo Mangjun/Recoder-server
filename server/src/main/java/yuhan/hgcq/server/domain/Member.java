@@ -31,6 +31,9 @@ public class Member {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Team> owners = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Liked> likeds = new ArrayList<>();
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<TeamMember> teamMembers = new ArrayList<>();
 
@@ -68,5 +71,10 @@ public class Member {
                 ", email='" + email + '\'' +
                 ", search=" + search +
                 '}';
+    }
+
+    @PreRemove
+    public void removeLiked() {
+        likeds.clear();
     }
 }
