@@ -44,7 +44,7 @@ public class ChatRepository {
     }
 
     public void deleteByMember(Member member) {
-        em.createQuery("delete from Chat c where c.member = :member")
+        em.createQuery("delete from Chat c where c.writer = :member")
                 .setParameter("member", member)
                 .executeUpdate();
     }
