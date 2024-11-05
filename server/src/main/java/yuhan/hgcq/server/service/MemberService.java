@@ -67,7 +67,7 @@ public class MemberService {
     @Transactional
     public void delete(Long memberId) {
         Member fm = mr.findOne(memberId);
-        lr.deleteByMember(fm);
+        // lr.deleteByMember(fm);
         fr.deleteByMember(fm);
         fr.deleteByFollow(fm);
         mr.delete(memberId);
